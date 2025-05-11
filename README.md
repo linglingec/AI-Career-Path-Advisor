@@ -58,8 +58,8 @@ backend/
 
 3. **Install dependencies**
    ```bash
-   cd backend/backend
    pip install -r requirements.txt
+   cd backend/backend
    ```
 
 4. **Install spaCy model**
