@@ -131,4 +131,4 @@ class DataProcessor:
             "education": education,
             "experience_level": experience_level,
             "github_data": github_data
-        } 
+        }
