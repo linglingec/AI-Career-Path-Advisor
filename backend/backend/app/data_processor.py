@@ -1,5 +1,5 @@
 import spacy
-import PyPDF2
+import pymupdf
 from typing import Dict, List, Optional
 import requests
 from bs4 import BeautifulSoup
@@ -18,13 +18,13 @@ IT_SKILLS = [
 class DataProcessor:
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
-        
+
     def extract_text_from_pdf(self, pdf_file) -> str:
         """Extract text from PDF file."""
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        doc = pymupdf.open(stream=pdf_file.read())
         text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+        for page in doc: # iterate the document pages
+            text += "\n".join([block[4].replace("\n", " ") for block in page.get_text("blocks")])
         return text
 
     def extract_skills(self, text: str) -> List[str]:
@@ -44,12 +44,20 @@ class DataProcessor:
     def extract_education(self, text: str) -> str:
         """Extract education information from text."""
         # Simple search by keywords
-        education_keywords = ["bachelor", "master", "phd", "msc", "bsc", "бакалавр", "магистр", "кандидат наук"]
+        education_keywords = {
+            "BSc": ["bachelor", "bsc", "бакалавр"],
+            "MSc": ["master", "msc", "магистр"],
+            "PhD": ["phd", "кандидат наук"],
+        }
+        degrees = dict()
         for line in text.splitlines():
-            for kw in education_keywords:
-                if kw.lower() in line.lower():
-                    return line.strip()
-        return ""
+            for degree, degree_kw in education_keywords.items():
+                for kw in degree_kw:
+                    if kw.lower() in line.lower():
+                        degrees[degree] = line
+                        break
+
+        return ", ".join(degrees.keys())
 
     def analyze_github_profile(self, github_url: Optional[str]) -> Dict:
         """Analyze GitHub profile and extract relevant information using GitHub API."""
