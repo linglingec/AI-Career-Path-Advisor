@@ -3,6 +3,7 @@ import pymupdf
 from typing import Dict, List, Optional
 import requests
 from bs4 import BeautifulSoup
+from sentence_transformers import SentenceTransformer, util
 
 # Example list of IT skills for keyword search
 IT_SKILLS = [
@@ -18,6 +19,19 @@ IT_SKILLS = [
 class DataProcessor:
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
+        # Multilingual model for semantic similarity (English, Russian, etc.)
+        self.sim_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+
+    def semantic_match(self, query: str, candidates: list, threshold: float = 0.7) -> list:
+        """
+        Returns candidates that are semantically similar to the query above the threshold.
+        """
+        if not candidates:
+            return []
+        emb_query = self.sim_model.encode(query, convert_to_tensor=True)
+        emb_cand = self.sim_model.encode(candidates, convert_to_tensor=True)
+        cos_scores = util.cos_sim(emb_query, emb_cand)[0].cpu().numpy()
+        return [candidates[i] for i, score in enumerate(cos_scores) if score >= threshold]
 
     def extract_text_from_pdf(self, pdf_file) -> str:
         """Extract text from PDF file."""
@@ -28,17 +42,21 @@ class DataProcessor:
         return text
 
     def extract_skills(self, text: str) -> List[str]:
-        """Extract skills from text using NLP and keyword matching."""
+        """
+        Extracts skills from text using semantic similarity (multilingual) and keyword matching.
+        """
         doc = self.nlp(text.lower())
         found_skills = set()
-        # Keyword search
+        # Semantic search for each skill in IT_SKILLS
         for skill in IT_SKILLS:
-            if skill in text.lower():
+            matches = self.semantic_match(skill, [text], threshold=0.45)
+            if matches:
                 found_skills.add(skill)
         # Entity search (e.g., ORG, PRODUCT)
         for ent in doc.ents:
-            if ent.label_ in ["ORG", "PRODUCT"] and ent.text.lower() in IT_SKILLS:
-                found_skills.add(ent.text.lower())
+            if ent.label_ in ["ORG", "PRODUCT"]:
+                matches = self.semantic_match(ent.text.lower(), IT_SKILLS, threshold=0.7)
+                found_skills.update(matches)
         return sorted(list(found_skills))
 
     def extract_education(self, text: str) -> str:
