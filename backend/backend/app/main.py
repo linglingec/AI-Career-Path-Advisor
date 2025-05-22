@@ -38,6 +38,10 @@ async def analyze_profile(
     transcript_text = data_processor.extract_text_from_pdf(transcript.file)
     resume_text = data_processor.extract_text_from_pdf(resume.file)
     
+    # Structured extraction for transcript and resume (all expanded sections)
+    structured_transcript = data_processor.extract_structured_transcript(transcript_text)
+    structured_resume = data_processor.extract_structured_resume(resume_text)
+    
     # Process profile data
     profile_data = data_processor.process_profile(
         transcript_text=transcript_text,
@@ -60,6 +64,8 @@ async def analyze_profile(
             "skills": profile_data["skills"],
             "education": profile_data["education"],
             "github_data": profile_data["github_data"],
+            "structured_resume": structured_resume,
+            "structured_transcript": structured_transcript,
             "recommendations": recommendations
         }
     }

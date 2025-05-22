@@ -226,6 +226,59 @@ function App() {
               </Card>
             </Grid>
 
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Resume Details</Typography>
+                  <List>
+                    <ListItem><ListItemText primary="Projects" secondary={(results.structured_resume?.projects || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Certifications" secondary={(results.structured_resume?.certifications || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Languages" secondary={(results.structured_resume?.languages || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Summary" secondary={results.structured_resume?.summary || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Achievements" secondary={(results.structured_resume?.achievements || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Interests" secondary={(results.structured_resume?.interests || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Publications" secondary={(results.structured_resume?.publications || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Volunteer" secondary={(results.structured_resume?.volunteer || []).join(', ') || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Contacts" secondary={
+                      results.structured_resume?.contacts ?
+                        Object.entries(results.structured_resume.contacts).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ')
+                        : '—'
+                    } /></ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Transcript Details</Typography>
+                  <List>
+                    <ListItem><ListItemText primary="Degree" secondary={results.structured_transcript?.degree || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="GPA" secondary={results.structured_transcript?.gpa || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="University" secondary={results.structured_transcript?.university || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Language of Instruction" secondary={results.structured_transcript?.language_of_instruction || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Personal Info" secondary={
+                      results.structured_transcript?.personal_info ?
+                        Object.entries(results.structured_transcript.personal_info).map(([k, v]) => `${k}: ${v}`).join(' | ')
+                        : '—'
+                    } /></ListItem>
+                    <ListItem><ListItemText primary="Courses" secondary={
+                      (results.structured_transcript?.courses && results.structured_transcript.courses.length > 0) ?
+                        results.structured_transcript.courses.map(c => `${c.code || ''} ${c.name || ''} (${c.grade || ''})`).join('; ')
+                        : '—'
+                    } /></ListItem>
+                    <ListItem><ListItemText primary="Major / Program" secondary={results.structured_transcript?.major_program || '—'} /></ListItem>
+                    <ListItem><ListItemText primary="Dates" secondary={
+                      results.structured_transcript?.dates ?
+                        Object.entries(results.structured_transcript.dates).map(([k, v]) => `${k}: ${v}`).join(' | ')
+                        : '—'
+                    } /></ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Grid>
+
             <Grid item xs={12}>
               <Card>
                 <CardContent>
